@@ -1,0 +1,263 @@
+#:import Window kivy.core.window.Window
+#:import DatePicker KivyCalendar.calendar_ui.DatePicker
+
+<MainBox>:
+    id: main_box
+    main_cols: 1
+    orientation: 'vertical'
+    padding: Window.height/160
+    spacing: Window.height/160
+    canvas:
+        Color:
+            rgba: (.56, .25, .12, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    SearchTextInput:
+        id: search
+        size_hint_y: .1
+        on_focus: main_box.show_search_actions(self.focus)
+        on_text: main_box.refresh_search_actions(self.text)
+    GridLayout:
+        id: main_area
+        size_hint_y: .9
+        cols: main_box.main_cols
+        spacing: Window.height/160
+
+
+<ResultBox>:
+    orientation: 'vertical'
+    padding: 5
+    spacing: 5
+    canvas:
+        Color:
+            rgba: (.1, .14, .15, 1)  # (.56, .25, .12, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    BoxLayout:
+        size_hint_y: .1
+        canvas:
+            Color:
+                rgba: (0, .17, .21, 1)
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Widget:
+            size_hint_x: .1
+        DatePicker:
+            id: date_start
+            pHint: 0.9, 0.6
+            background_color: (0, 0, 0, 0)
+            foreground_color: (.15, .55, .83, 1)
+            text_size: self.size
+            halign: 'right'
+            valign: 'middle'
+            padding_y: (self.height - self.font_size) / 2
+            size_hint_x: .35
+            on_text: root.refresh_result_area()
+        Label:
+            size_hint_x: .1
+            text: " - "
+            color: (.15, .55, .83, 1)
+        DatePicker:
+            id: date_finish
+            pHint: 0.9, 0.6
+            background_color: (0, 0, 0, 0)
+            foreground_color: (.15, .55, .83, 1)
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+            padding_y: (self.height - self.font_size) / 2
+            size_hint_x: .35
+            on_text: root.refresh_result_area()
+        Button:
+            size_hint_x: .1
+            background_color: (0, 0, 0, 0)
+            color: (.15, .55, .83, 1)
+            text: "..."
+            text_size: self.size
+            halign: 'center'
+            valign: 'middle'
+            on_release: root.open_settings(self)
+    BoxLayout:
+        size_hint_y: .05
+        Label:
+            size_hint_x: .61
+            color: (.20, .36, .45, 1)
+            text: "Action"
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+            padding_x: Window.width/30
+        Label:
+            size_hint_x: .13
+            color: (.20, .36, .45, 1)
+            text: "Days"
+        Label:
+            size_hint_x: .13
+            color: (.20, .36, .45, 1)
+            text: "Hours"
+        Label:
+            size_hint_x: .13
+            color: (.20, .36, .45, 1)
+            text: "Mins"
+    ScrollView:
+        size_hint_y: .85
+        GridLayout:
+            id: result_area
+            size_hint_y: None
+            height: self.minimum_height
+            cols: 1
+            spacing: Window.height/100
+
+
+<MyActionButton>:
+    on_state: self.set_in_process()
+    background_normal: ''
+    background_down: ''
+    background_color: (0, .12, .21, 1) if self.state == 'down' else (0, .17, .21, 1)
+    color: (.15, .55, .83, 1)
+    text_size: self.size
+    halign: 'center'
+    valign: 'middle'
+
+
+<ResultLine>:
+    size_hint_y: None
+    height: Window.height / 10
+    canvas:
+        Color:
+            rgba: (0, .17, .21, 1)  # (0, .17, .21, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+    Label:
+        id: action
+        size_hint_x: .61
+        text_size: self.size
+        color: (.15, .55, .83, 1)
+        halign: 'left'
+        valign: 'middle'
+        padding_x: Window.width/30
+    Label:
+        id: days
+        size_hint_x: .13
+        color: (.15, .55, .83, 1)
+    Label:
+        id: hours
+        size_hint_x: .13
+        color: (.15, .55, .83, 1)
+    Label:
+        id: minutes
+        size_hint_x: .13
+        color: (.15, .55, .83, 1)
+
+
+<SearchTextInput>:
+    background_color: (0, .15, .21, 1)
+    multiline: False
+    foreground_color: (.15, .55, .83, 1) if self.focus else (.20, .36, .45, 1)
+    text: "Input action" if not self.focus else ""
+    text_size: self.size
+    halign: 'center'
+    valign: 'middle'
+    padding_y: (self.height - self.font_size) / 2
+
+
+<SearchButton>:
+    background_normal: ''
+    background_down: ''
+    background_color: (0, .15, .20, 1)
+    color: (.15, .55, .83, 1)
+    text_size: self.size
+    halign: 'center'
+    valign: 'middle'
+
+
+<SearchLine>:
+    size_hint_y: None
+    height: Window.height / 10
+    SearchButton:
+        id: action
+        size_hint_x: .9
+    SearchButton:
+        size_hint_x: .1
+        text: "Del"
+        on_press: root.remove_action(action.text)
+
+
+<RoundButton>:
+    allowed_to_move: False
+    background_normal: ''
+    background_down: ''
+    background_color: (0, 0, 0, 0)
+    size_hint: None, None
+    size: Window.width/(6 if not self.allowed_to_move else 5.5), Window.width/(6 if not self.allowed_to_move else 5.5)
+    pos: Window.width * .8, Window.height * .3
+    canvas.before:
+        Color:
+            rgba: (.56, .25, .12, 1)
+        RoundedRectangle:
+            size: self.size
+            pos: self.pos
+            radius: [Window.width/12]
+        Color:
+            rgba: (0, .14, .20, 1)
+        RoundedRectangle:
+            size: [z - Window.width/100 for z in self.size]
+            pos: [self.center[0] - (self.size[0] - Window.width/100) / 2, self.center[1] - (self.size[1] - Window.width/100) / 2]
+            radius: [Window.width/12 - Window.width/200]
+
+
+<ResultSettingsDD>:
+    Button:
+        text: 'in detail'
+        size_hint_y: None
+        height: Window.height/12
+        background_normal: ''
+        background_down: ''
+        background_color: (0, .15, .20, 1)
+        color: (.15, .55, .83, 1)
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        padding_x: Window.width/18
+        on_press: root.change_show_variant('in detail')
+    Button:
+        text: 'in total'
+        size_hint_y: None
+        height: Window.height/12
+        background_normal: ''
+        background_down: ''
+        background_color: (0, .15, .20, 1)
+        color: (.15, .55, .83, 1)
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        padding_x: Window.width/18
+        on_press: root.change_show_variant('in total')
+    Button:
+        text: 'stub'
+        size_hint_y: None
+        height: Window.height/12
+        background_normal: ''
+        background_down: ''
+        background_color: (0, .15, .20, 1)
+        color: (.15, .55, .83, 1)
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        padding_x: Window.width/18
+    Button:
+        text: 'stub'
+        size_hint_y: None
+        height: Window.height/12
+        background_normal: ''
+        background_down: ''
+        background_color: (0, .15, .20, 1)
+        color: (.15, .55, .83, 1)
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        padding_x: Window.width/18

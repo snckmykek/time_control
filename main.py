@@ -1,13 +1,15 @@
 # TODO: Сейчас выполненные задания отбираются только по дате старта, типо сегодня стартанул, значит действие сеодняшнее
 # TODO: но заполняются они целиком, не рубятся до 23.59.59, то есть надо сделать чтобы при выполнении действия
 # TODO: на стыки нескольких дней была разбика по действиям от 0:00 до 23:59:59
+
+# TODO: Когда нажимаешь и держить и удаляется актион, то 2 записи в бд становится
 # kivy version 1.11.1
 
-from kivy.config import Config
-
-Config.set('graphics', 'resizable', '1')
-Config.set('graphics', 'width', '360')
-Config.set('graphics', 'height', '640')
+# from kivy.config import Config
+#
+# Config.set('graphics', 'resizable', '1')
+# Config.set('graphics', 'width', '360')
+# Config.set('graphics', 'height', '640')
 
 from kivy.app import App
 from kivy.core.window import Window
@@ -69,8 +71,6 @@ class MyActionButton(ToggleButton):
             self._clockev = Clock.schedule_once(self.remove_action, self.long_press_time)
             self.pressing = True
 
-        # return super(MyActionButton, self).on_touch_down(touch)
-
     def on_touch_up(self, touch):
         try:
             self._clockev.cancel()
@@ -126,6 +126,8 @@ class RoundButton(Button):
         self.my_function = None
         self.direction = ''
         self.allowed_to_move = False
+        self.current_center = [Window.width * .8, Window.height * .3]
+        self.touch_delta = [0, 0]
 
     def on_release(self):
 
@@ -160,6 +162,7 @@ class RoundButton(Button):
     def on_touch_down(self, touch):
         if self.collide_point(*touch.pos):
             self._clockev = Clock.schedule_once(self.allow_to_move, self.long_press_time)
+            self.touch_delta = [self.center_x - touch.x, self.center_y - touch.y]
 
         return super(RoundButton, self).on_touch_down(touch)
 
@@ -178,7 +181,7 @@ class RoundButton(Button):
         if self.collide_point(*touch.pos) and self.allowed_to_move:
             # TODO: сделать не чтобы где мышка там и центр, а чтобы изначально бралась разница touch.pos
             # TODO и центраи перемещалось так же (чтобы когда  перемещаешь за край кнопка не дергалась центом в мышку)
-            self.center = touch.pos
+            self.current_center = touch.x + self.touch_delta[0], touch.y + self.touch_delta[1]
 
         return super(RoundButton, self).on_touch_move(touch)
 
@@ -292,9 +295,8 @@ class MainBox(BoxLayout):
         self.set_cols(len(actions))
 
         for action in actions:
-            act_butt = MyActionButton(text=str(action[1]))
+            act_butt = MyActionButton(text=str(action[1]), state='down' if action[2] == 'True' else 'normal')
             act_butt.date_start = action[0]
-            act_butt.state = 'down' if action[2] == 'True' else 'normal'
             act_butt.my_parent = self
             self.main_area.add_widget(act_butt)
 

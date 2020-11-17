@@ -70,7 +70,7 @@ class Database(object):
         self.con.commit()
 
     def save_completed_action(self, action):
-        #
+
         self.cur.execute('UPDATE current_actions SET is_active = "{}" WHERE action = "{}"'.format(False, action))
 
         self.cur.execute('SELECT date_start FROM current_actions WHERE action = "{}"'.format(action))

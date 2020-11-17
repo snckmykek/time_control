@@ -189,12 +189,13 @@
 
 <RoundButton>:
     allowed_to_move: False
+    current_center: (0, 0)
     background_normal: ''
     background_down: ''
     background_color: (0, 0, 0, 0)
     size_hint: None, None
     size: Window.width/(6 if not self.allowed_to_move else 5.5), Window.width/(6 if not self.allowed_to_move else 5.5)
-    pos: Window.width * .8, Window.height * .3
+    center: self.current_center
     canvas.before:
         Color:
             rgba: (.56, .25, .12, 1)
